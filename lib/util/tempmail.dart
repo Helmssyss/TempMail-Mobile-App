@@ -24,6 +24,7 @@ class TempMail {
   }
 
   Future<void> _getPHPSESSID() async {
+    _headers.remove("Cookie");
     const String url = "https://www.fakemail.net/";
     var response = await http.get(Uri.parse(url));
 
@@ -41,17 +42,6 @@ class TempMail {
   }
 
   Future<String> _createAccount() async {
-    const Map<String, String> _headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36",
-      "X-Requested-With": "XMLHttpRequest",
-      "Accept": "application/json, text/javascript, */*; q=0.01",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
-      "Connection": "keep-alive",
-      "Host": "www.fakemail.net",
-      "Referer": "https://www.fakemail.net/"
-    };
     String _getMail = '';
     const String url = "https://www.fakemail.net/index/index";
     var response = await http.get(Uri.parse(url), headers: _headers);
