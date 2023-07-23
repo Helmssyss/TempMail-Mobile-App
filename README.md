@@ -4,4 +4,4 @@ A new Flutter project.
 
 For Educational Only.
 
-To be continued...
+README will be edited
