@@ -42,7 +42,6 @@ class TempMail {
       }
     }
     getPHPSESSID = getPHPSESSID.split('=')[1];
-    print(getPHPSESSID);
   }
 
   Future<String> _createAccount() async {
@@ -58,11 +57,10 @@ class TempMail {
           _getMail += tma[i];
         }
       }
-
+      
       List<String> _mail = _getMail.split('=');
       String mail = _mail[1];
-
-      print(mail.replaceAll(RegExp(r"%40"), '@'));
+      
       return mail;
     }
     return '';
@@ -84,20 +82,12 @@ class TempMail {
     var response = await http.get(
         Uri.parse("https://www.fakemail.net/index/refresh"),
         headers: _headers);
-    print(response.body);
     getMailContent = json.decode(response.body);
     currentInboxCount = getMailContent.length;
-
-    print(
-        "currentInboxCount: $currentInboxCount --- lastInboxCount: $lastInboxCount");
 
     if (lastInboxCount != currentInboxCount) {
       lastInboxCount = currentInboxCount;
       isReadMails.insert(0, true);
-      print("mail geldi");
-    } else {
-      print("yeni bir mail yok");
     }
-    print(isReadMails);
   }
 }
