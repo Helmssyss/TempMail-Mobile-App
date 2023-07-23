@@ -20,7 +20,6 @@ class _MailWidgetState extends State<MailWidget> {
 
   void _setMailIcon({required int index}) {
     _tempMail.isReadMails[index] = false;
-    print(_tempMail.isReadMails);
   }
 
   Widget _createMailDesign() {
@@ -132,8 +131,6 @@ class _MailWidgetState extends State<MailWidget> {
                                 ),
                         ),
                         onTap: () async {
-                          print("index = $index");
-
                           await _tempMail
                               .mailContent(id: _getMailContent[index]['id'])
                               .then((value) {
