@@ -31,7 +31,7 @@ class _MailWidgetState extends State<MailWidget> {
       return Expanded(
         flex: 2,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             constSizeBox,
             Padding(
@@ -49,37 +49,42 @@ class _MailWidgetState extends State<MailWidget> {
                   _mailAddr.replaceAll(RegExp(r"%40"), '@'),
                   style: const TextStyle(
                       color: Colors.amber,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w300,
                       fontSize: 20),
                 ),
               ),
             ),
-            IconButton(
-                onPressed: () async {
-                  if (_tempMail.isReadMails.isNotEmpty) {
-                    _tempMail.isReadMails
-                        .removeRange(0, _tempMail.isReadMails.length);
-                  }
-                  await initMail();
-                },
-                icon: const Icon(
-                  Icons.add_box,
-                  size: 30,
-                  color: Colors.amber,
-                )),
-            IconButton(
-              onPressed: () async =>
-                  await _tempMail.inbox(tma: _mailAddr).then((_) => setState(
-                        () {
-                          if (_inboxTimer.isActive) {
-                            _inboxTimer.cancel();
-                            setInboxTimerManager();
-                          }
-                          _getMailContent = _tempMail.getMailContent;
-                        },
-                      )),
-              icon: const Icon(Icons.refresh_sharp,
-                  size: 30, color: Colors.amber),
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () async {
+                      if (_tempMail.isReadMails.isNotEmpty) {
+                        _tempMail.isReadMails
+                            .removeRange(0, _tempMail.isReadMails.length);
+                      }
+                      await initMail();
+                    },
+                    icon: const Icon(
+                      Icons.add_box,
+                      size: 30,
+                      color: Colors.amber,
+                    )),
+                IconButton(
+                  onPressed: () async => await _tempMail
+                      .inbox(tma: _mailAddr)
+                      .then((_) => setState(
+                            () {
+                              if (_inboxTimer.isActive) {
+                                _inboxTimer.cancel();
+                                setInboxTimerManager();
+                              }
+                              _getMailContent = _tempMail.getMailContent;
+                            },
+                          )),
+                  icon: const Icon(Icons.refresh_sharp,
+                      size: 30, color: Colors.amber),
+                ),
+              ],
             ),
           ],
         ),
@@ -159,13 +164,36 @@ class _MailWidgetState extends State<MailWidget> {
                               });
                             },
                           ))
-                  : const Align(
+                  : Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 200),
-                        child: CircularProgressIndicator(
-                          color: Colors.amber,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 190),
+                        child: _mailAddr == ''
+                            ? Column(
+                                children: const [
+                                  CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: Colors.amber,
+                                  ),
+                                  SizedBox(
+                                    height: 28,
+                                  ),
+                                  Text(
+                                    "Mail Hesabı Oluşturuluyor",
+                                    style: TextStyle(
+                                        color: Colors.amber,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w200),
+                                  )
+                                ],
+                              )
+                            : const Text(
+                                "Gelen Kutun Boş",
+                                style: TextStyle(
+                                    color: Colors.indigoAccent,
+                                    fontSize: 50,
+                                    fontWeight: FontWeight.w200),
+                              ),
                       ),
                     )),
         ],
