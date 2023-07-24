@@ -3,5 +3,5 @@ Bu uygulama "FakeMail.net" adresini kazıyarak işlem yapar, eğer kazınan web 
 
 github.com/Helmssyss
 
-Uygulama ilk girildiğinde size bir mail hesabı oluşturur, işlem sonrası gelen maile bakmak için "yenile" butonuna basabilirsiniz. gelecek güncellemeler ile bu otomatize edilecektir. Halihazırda mail hesabınız varken tekrar oluşturursanız önceki mail hesabınıza gelen postalara ulaşamazsınız.
+Uygulama ilk girildiğinde size bir mail hesabı oluşturur, işlem sonrası gelen maile bakmak için "yenile" butonuna basabilir ya da gelmesini bekleyebilirsiniz. Halihazırda mail hesabınız varken tekrar oluşturursanız önceki mail hesabınıza gelen postalara ulaşamazsınız.
 ''';
