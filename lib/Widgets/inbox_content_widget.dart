@@ -1,4 +1,6 @@
 // ignore: file_names
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:temp_mail_app/src/tempmail.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +13,7 @@ class MailWidget extends StatefulWidget {
 }
 
 class _MailWidgetState extends State<MailWidget> {
+  late Timer _inboxTimer;
   late final TempMail _tempMail;
   final SizedBox constSizeBox = const SizedBox(height: 100);
 
@@ -20,6 +23,7 @@ class _MailWidgetState extends State<MailWidget> {
 
   void _setMailIcon({required int index}) {
     _tempMail.isReadMails[index] = false;
+    print(_tempMail.isReadMails);
   }
 
   Widget _createMailDesign() {
@@ -60,18 +64,22 @@ class _MailWidgetState extends State<MailWidget> {
                 },
                 icon: const Icon(
                   Icons.add_box,
-                  size: 40,
+                  size: 30,
                   color: Colors.amber,
                 )),
             IconButton(
               onPressed: () async =>
                   await _tempMail.inbox(tma: _mailAddr).then((_) => setState(
                         () {
+                          if (_inboxTimer.isActive) {
+                            _inboxTimer.cancel();
+                            setInboxTimerManager();
+                          }
                           _getMailContent = _tempMail.getMailContent;
                         },
                       )),
               icon: const Icon(Icons.refresh_sharp,
-                  size: 40, color: Colors.amber),
+                  size: 30, color: Colors.amber),
             ),
           ],
         ),
@@ -91,85 +99,89 @@ class _MailWidgetState extends State<MailWidget> {
             children: [_createMailDesign()],
           ),
           Expanded(
-              child: _getMailContent.isNotEmpty
+              child: _tempMail.isReadMails.isNotEmpty
                   ? ListView.builder(
-                      itemCount: _getMailContent.length,
+                      itemCount: _tempMail.isReadMails.length,
                       itemBuilder: (context, index) => InkWell(
-                        child: ListTile(
-                          title: Text(
-                            _getMailContent[index]['od']
-                                .toString()
-                                .split('<')[1]
-                                .replaceAll(RegExp(r">"), ''),
-                            style: const TextStyle(
-                                color: Colors.amber,
-                                fontStyle: FontStyle.italic),
-                          ),
-                          subtitle: Text(
-                            _getMailContent[index]['predmet'],
-                            style: const TextStyle(color: Colors.amberAccent),
-                          ),
-                          leading: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              _tempMail.isReadMails.elementAt(index)
-                                  ? Icons.mark_email_unread_rounded
-                                  : Icons.mark_email_read_outlined,
-                              color: Colors.amber,
-                              size: 30,
-                            ),
-                          ),
-                          trailing: _tempMail.isReadMails.elementAt(index)
-                              ? const Text("")
-                              : const Text(
-                                  "O K U N D U",
-                                  style: TextStyle(
-                                      color: Colors.amber,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      wordSpacing: 1),
-                                ),
-                        ),
-                        onTap: () async {
-                          await _tempMail
-                              .mailContent(id: _getMailContent[index]['id'])
-                              .then((value) {
-                            Navigator.of(context)
-                                .pushNamed("/mail_content", arguments: value);
-                            setState(() => _setMailIcon(index: index));
-                          });
-                        },
-                      ),
-                    )
-                  : Container(
-                      margin: const EdgeInsets.all(24),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 100, right: 2),
-                          child: Column(
-                            children: const [
-                              CircularProgressIndicator(
-                                color: Colors.amber,
+                            child: ListTile(
+                              title: Text(
+                                _getMailContent[index]['od']
+                                    .toString()
+                                    .split('<')[1]
+                                    .replaceAll(RegExp(r">"), ''),
+                                style: const TextStyle(
+                                    color: Colors.amber,
+                                    fontStyle: FontStyle.italic),
                               ),
-                              SizedBox(
-                                height: 20,
+                              subtitle: Text(
+                                _getMailContent[index]['predmet'],
+                                style:
+                                    const TextStyle(color: Colors.amberAccent),
                               ),
-                              Text(
-                                'Mail Adresi Oluşturuluyor',
-                                style: TextStyle(
-                                  fontSize: 28,
+                              leading: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  _tempMail.isReadMails.elementAt(index)
+                                      ? Icons.mark_email_unread_rounded
+                                      : Icons.mark_email_read_outlined,
                                   color: Colors.amber,
+                                  size: 30,
                                 ),
                               ),
-                            ],
-                          ),
+                              trailing: _tempMail.isReadMails.elementAt(index)
+                                  ? const Text("")
+                                  : const Text(
+                                      "O K U N D U",
+                                      style: TextStyle(
+                                          color: Colors.amber,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          wordSpacing: 1),
+                                    ),
+                            ),
+                            onTap: () async {
+                              print("index = $index");
+
+                              await _tempMail
+                                  .mailContent(id: _getMailContent[index]['id'])
+                                  .then((value) {
+                                Navigator.of(context)
+                                    .pushNamed("/mail_content", arguments: [
+                                  _getMailContent[index]['od']
+                                      .toString()
+                                      .split('<')[1]
+                                      .replaceAll(RegExp(r">"), ''),
+                                  value
+                                ]);
+                                setState(() => _setMailIcon(index: index));
+                                _inboxTimer.cancel();
+                                setInboxTimerManager();
+                              });
+                            },
+                          ))
+                  : const Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 200),
+                        child: CircularProgressIndicator(
+                          color: Colors.amber,
                         ),
                       ),
                     )),
         ],
       ),
     );
+  }
+
+  void setInboxTimerManager() {
+    _inboxTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _tempMail.inbox(tma: _mailAddr).then((_) => setState(
+            () {
+              _getMailContent = _tempMail.getMailContent;
+              print("object");
+            },
+          ));
+    });
   }
 
   Future<void> initMail() async {
@@ -186,7 +198,11 @@ class _MailWidgetState extends State<MailWidget> {
   void initState() {
     super.initState();
     _tempMail = TempMail();
-    initMail().then((_) => _isReadedMails.add(true));
+
+    initMail().then((_) {
+      setInboxTimerManager();
+      _isReadedMails.add(true);
+    });
   }
 
   @override
